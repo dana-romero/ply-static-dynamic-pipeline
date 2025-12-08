@@ -1,0 +1,21 @@
+# Python environment
+venv/
+plycolmap/
+__pycache__/
+
+# macOS
+.DS_Store
+
+# Large 3D assets
+0448_ply/
+output_ply/
+dataset_v3/images/
+dataset_v3/masks/
+
+# COLMAP output
+dataset_v3/sparse/
+colmap_masked/
+colmap_undistorted/
+
+# Logs
+*.log

@@ -1,0 +1,5 @@
+conda create -n plycolmap python=3.10 -y
+conda activate plycolmap
+conda install -c conda-forge colmap -y
+conda install -c conda-forge numpy imageio -y
+pip install numpy imageio 
