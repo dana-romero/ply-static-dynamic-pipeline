@@ -19,7 +19,8 @@ def run_pipeline():
     print("Output directory:", OUT_DIR)
 
     # Step 1: STATIC MASTER
-    first_frame_path = os.path.join(PLY_DIR, "time_00000.ply")
+    frame_for_exclusion = 30
+    first_frame_path = os.path.join(PLY_DIR, f"time_{frame_for_exclusion:05d}.ply")   
     print("Loading first frame:", first_frame_path)
 
     if not os.path.isfile(first_frame_path):
@@ -29,11 +30,26 @@ def run_pipeline():
     g0 = load_ply_gaussians(first_frame_path)
     print("Loaded g0:", g0.shape)
 
-    masks0 = load_masks_for_frame(0, cams)
-    print("Loaded masks for frame 0")
+    masks0 = load_masks_for_frame(frame_for_exclusion, cams)
+    print("Loaded masks for frame {frame_for_exclusion}")
+
+    # --- DEBUGGING MASK CONTENT ---
+    # Check if the first mask in the list contains white (dynamic) pixels
+    import numpy as np
+    
+    # Check if any camera's mask has a max value of 255
+    max_mask_value = max(np.max(m) for m in masks0) if masks0 else 0
+    
+    print(f"[DEBUG] Total cameras: {len(masks0)}")
+    print(f"[DEBUG] Max pixel value across all masks (should be 255 if person is visible): {max_mask_value}")
+    # --- END DEBUGGING MASK CONTENT ---
+
+
+    print(f"[DEBUG] First mask shape: {masks0[0].shape}")
+    print(f"[DEBUG] First mask max value: {np.max(masks0[0])}")
 
     print("Classifying static/dynamic...")
-    static_mask, dynamic_mask0 = classify_splats(g0, cams, masks0)
+    static_mask, dynamic_mask0 = classify_splats(g0, cams, masks0, thresh=1)
     print("Static count:", np.sum(static_mask), "Dynamic count:", np.sum(dynamic_mask0))
 
     static_master = g0[static_mask]
@@ -57,7 +73,7 @@ def run_pipeline():
         g = load_ply_gaussians(frame_path)
         masks_i = load_masks_for_frame(i, cams)
 
-        _, dynamic_mask = classify_splats(g, cams, masks_i)
+        _, dynamic_mask = classify_splats(g, cams, masks_i, thresh=1)
         dynamic = g[dynamic_mask]
 
         dyn_path = os.path.join(OUT_DIR, f"Dynamic_{i:05d}.ply")

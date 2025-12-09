@@ -55,13 +55,29 @@ def load_masks_for_frame(frame_idx, cams):
 def project_points(K, R, T, xyz):
     """
     xyz: (N,3) world coords
-    returns:
-        uv: (N,2) image coordinates
-        depth: (N,)
+    R, T are assumed to be Camera-to-World (C2W) poses from COLMAP.
     """
-    RT = np.hstack([R, T.reshape(3, 1)])
+    # --- CRITICAL FIX: INVERT POSE TO GET WORLD-TO-CAMERA (W2C) ---
+    
+    # R_W2C is the transpose of R_C2W
+    R_W2C = R.T 
+    
+    # T_W2C = -R_W2C @ T_C2W (COLMAP convention)
+    T_C2W_vector = T.flatten()
+    T_W2C_vector = -R_W2C @ T_C2W_vector
+    
+    # Reshape the new T for stacking
+    T_W2C_reshaped = T_W2C_vector.reshape(3, 1)
+
+    # --- Use the inverted W2C matrices for projection ---
+    RT_W2C = np.hstack([R_W2C, T_W2C_reshaped])
+    
     pts_h = np.hstack([xyz, np.ones((xyz.shape[0], 1))])
-    pts_cam = pts_h @ RT.T
+    
+    # The projection now uses the correct W2C transformation:
+    pts_cam = pts_h @ RT_W2C.T
+    
+    # The rest of the calculation is correct
     pts_img = pts_cam @ K.T
 
     u = pts_img[:, 0] / pts_img[:, 2]

@@ -3,7 +3,8 @@ import json
 import numpy as np
 from colmap_text_utils import read_cameras_text, read_images_text
 
-SPARSE_DIR = os.path.join("sparse_small", "0")
+#SPARSE_DIR = os.path.join("sparse_small", "0")
+SPARSE_DIR = os.path.join("dataset_v3", "sparse")
 DATA_ROOT = "dataset_v3"
 MASKS_DIR = os.path.join(DATA_ROOT, "masks")
 OUTPUT_JSON = os.path.join(DATA_ROOT, "camera_config.json")
@@ -57,15 +58,24 @@ def build_camera_config():
         R = qvec2rotmat(img["qvec"])
         T = img["tvec"]
 
-        image_name = img["name"]  # e.g. "001001_time_00000.png"
+        image_name = img["name"] 
 
-        # Extract camera folder and frame id
-        if "_time_" not in image_name:
+        #corrected parsing
+        # Assuming format is CAMID.png (e.g., "001001.png") and is always Frame 0
+
+        # Check if the file is a standard PNG image
+        if not image_name.endswith(".png"):
+            # This should only happen if the COLMAP output file has errors
             raise RuntimeError(f"Unexpected image format: {image_name}")
 
-        cam_folder, frame_part = image_name.split("_time_")
-        mask_folder = cam_folder       # e.g. "001001"
-        frame_id = frame_part.split(".")[0]  # e.g. "00000"
+        # Extract the camera ID from the filename (e.g., "001001")
+        cam_folder = image_name.split(".")[0] 
+        
+        # Since COLMAP was run only on the first frame, we hardcode the frame ID.
+        frame_id = "00000" 
+        
+        mask_folder = cam_folder # The mask folder uses the camera ID
+        # --- END CORRECTED PARSING ---
 
         # Check if mask folder exists
         mask_folder_path = os.path.join(MASKS_DIR, mask_folder)
@@ -86,6 +96,14 @@ def build_camera_config():
 
         print(f"cam_index={cam_index:2d}  cam='{mask_folder}'  image='{image_name}'")
 
+    # --- CRITICAL FIX: SORT BY MASK FOLDER/CAMERA ID ---
+    cameras_cfg = sorted(cameras_cfg, key=lambda x: x['mask_folder'])
+    
+    # Re-assign cam_index sequentially after sorting (optional, but cleaner)
+    for i, cam_info in enumerate(cameras_cfg):
+        cam_info['cam_index'] = i
+    # --- END CRITICAL FIX ---
+    
     os.makedirs(DATA_ROOT, exist_ok=True)
     with open(OUTPUT_JSON, "w") as f:
         json.dump({"cameras": cameras_cfg}, f, indent=2)

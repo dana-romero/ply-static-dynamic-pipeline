@@ -44,6 +44,13 @@ def classify_splats(gaussians, cams, masks, thresh=2):
 
         dynamic_votes[valid_idx] += (sampled_mask > 0).astype(np.int32)
 
+        # --- DEBUGGING LINES ---
+        max_votes = np.max(dynamic_votes)
+        total_dynamic_splats = np.sum(dynamic_votes >= thresh)
+        print(f"[DEBUG] Max votes for any splat: {max_votes}")
+        print(f"[DEBUG] Splats meeting threshold ({thresh}): {total_dynamic_splats}")
+        # --- END DEBUGGING LINES ---
+
     dynamic_mask = dynamic_votes >= thresh
     static_mask = ~dynamic_mask
 
