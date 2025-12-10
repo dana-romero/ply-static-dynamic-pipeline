@@ -19,3 +19,5 @@ colmap_undistorted/
 
 # Logs
 *.log
+
+alignment_tmp/

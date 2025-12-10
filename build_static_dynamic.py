@@ -14,7 +14,7 @@ def run_pipeline():
     print("Loading cameras...")
     cams = load_cameras()
     print("Loaded", len(cams), "cameras")
-
+    
     os.makedirs(OUT_DIR, exist_ok=True)
     print("Output directory:", OUT_DIR)
 
@@ -33,6 +33,12 @@ def run_pipeline():
     masks0 = load_masks_for_frame(frame_for_exclusion, cams)
     print("Loaded masks for frame {frame_for_exclusion}")
 
+    print(f"[DEBUG] Number of cameras: {len(cams)}")
+    print(f"[DEBUG] Number of masks: {len(masks0)}")
+
+    # Check if cameras and masks match
+    for i, (cam, mask) in enumerate(zip(cams, masks0)):
+        print(f"Camera {i}: {cam.width}x{cam.height}, Mask: {mask.shape}")
     # --- DEBUGGING MASK CONTENT ---
     # Check if the first mask in the list contains white (dynamic) pixels
     import numpy as np

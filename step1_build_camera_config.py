@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 from colmap_text_utils import read_cameras_text, read_images_text
-
+#now obsolete!
 #SPARSE_DIR = os.path.join("sparse_small", "0")
 SPARSE_DIR = os.path.join("dataset_v3", "sparse")
 DATA_ROOT = "dataset_v3"

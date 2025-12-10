@@ -31,19 +31,20 @@ ply_pipeline/
 │   │   ├── 001001_time_00000.png
 │   │   ├── 002001_time_00000.png
 │   │   └── ...
-│   ├── masks/
-│   │   ├── 001001/
-│   │   │   ├── 000000.png
-│   │   │   ├── 000001.png
-│   │   │   └── ...
-│   │   ├── 002001/
-│   │   └── ...
-│   └── sparse/
-│       ├── cameras.bin
-│       ├── images.bin
-│       └── points3D.bin
+│   └── masks/
+│       ├── 001001/
+│       │   ├── 000000.png
+│       │   ├── 000001.png
+│       │   └── ...
+│       ├── 002001/
+│       └── ...
+│ 
+├── TA_sparse_text/
+│   ├── cameras.txt                 
+│   ├── images.txt
+│   └── points3D.txt
 │
-├── step1_build_camera_config.py
+├── generate_camera_config.py
 ├── build_static_dynamic.py
 ├── classify_splats.py
 ├── gaussian_io.py / load_gaussians.py
@@ -83,11 +84,11 @@ pip install numpy pillow imageio tqdm
 
 This step processes the **COLMAP files** (`cameras.bin`, `images.bin`) to create the necessary **camera configuration** for splat projection. 
 
-* **Script:** `step1_build_camera_config.py`
+* **Script:** `generate_camera_config.py`
 * **Run:**
 
 ```bash
-python step1_build_camera_config.py
+python generate_camera_config.py
 ```
 Expected outcome: 
 
@@ -124,4 +125,8 @@ Use a standard Gaussian Splat viewer (e.g., SuperSplat, various web viewers) to 
 
 
 ## 5. Known Limitation
-The current version may occasionally **misclassify some splats**, leading to minor artifacts in the final decomposition. Improvements are planned for future versions.
+Right now our static master isn’t fully “static.”
+Some parts of people still show up, especially if they weren’t moving much or if the mask didn’t catch them.
+
+Also, dynamic detection is better, but still incomplete
+Even with the new projection + voting, we’re still not catching all dynamic splats.
