@@ -66,6 +66,15 @@ Notes:
 
 ## 1. Environment Setup
 
+You may set up the environment in either of the following ways.
+
+### Option A: Use the exact environment
+```bash
+conda env create -f environment_actual.yml
+conda activate plycolmap
+```
+
+### Option B: Minimal manual setup
 Inside `ply_pipeline/`:
 
 ```bash
@@ -77,7 +86,6 @@ source plycolmap/bin/activate
 ```bash
 pip install numpy pillow imageio tqdm
 ```
-
 
 
 ## 2. Build Camera Configuration
@@ -124,9 +132,3 @@ python build_static_dynamic.py
 Use a standard Gaussian Splat viewer (e.g., SuperSplat, various web viewers) to inspect the generated PLY outputs (Static_Master.ply, Dynamic_time_XXXXX.ply).
 
 
-## 5. Known Limitation
-Right now our static master isn’t fully “static.”
-Some parts of people still show up, especially if they weren’t moving much or if the mask didn’t catch them.
-
-Also, dynamic detection is better, but still incomplete
-Even with the new projection + voting, we’re still not catching all dynamic splats.
