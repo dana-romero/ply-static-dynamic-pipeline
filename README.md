@@ -69,16 +69,14 @@ Notes:
 Inside `ply_pipeline/`:
 
 ```bash
-python -m venv plycolmap
-source plycolmap/bin/activate
+python -m venv venv
+source venv/bin/activate
 ```
 
 **Install necessary Python packages**
 ```bash
-pip install numpy pillow imageio tqdm
+$ pip install numpy pillow imageio tqdm opencv-python plyfile scipy
 ```
-
-
 
 ## 2. Build Camera Configuration
 
